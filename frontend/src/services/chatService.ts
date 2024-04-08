@@ -1,36 +1,45 @@
 import {
   Message,
-  appeendToNewChatSequence,
+  appendToNewChatSequence,
   appendUserMessage,
-  emptyOutQueuedTyping,
-  setCurrentQueueMarker,
-  setCurrentTypingMessage,
+  takeOneTypeIt,
   toggleTypingActive,
 } from "../state/chatSlice";
-import socket from "../socket/socket";
+import Socket from "./socket";
 import store from "../store";
+import ActionType from "../types/ActionType";
+import { SocketMessage } from "../types/ResponseType";
+import { ActionMessage } from "../types/Message";
 
 export function sendChatMessage(message: string): void {
   store.dispatch(appendUserMessage(message));
-  const event = { action: "start", args: { task: message } };
+  const event = { action: ActionType.START, args: { task: message } };
   const eventString = JSON.stringify(event);
-  socket.send(eventString);
+  Socket.send(eventString);
 }
 
-export function setTypingAcitve(bool: boolean): void {
+export function sendChatMessageFromEvent(event: string | SocketMessage): void {
+  try {
+    let data: ActionMessage;
+    if (typeof event === "string") {
+      data = JSON.parse(event);
+    } else {
+      data = event as ActionMessage;
+    }
+    if (data && data.args && data.args.task) {
+      store.dispatch(appendUserMessage(data.args.task));
+    }
+  } catch (error) {
+    //
+  }
+}
+
+export function setTypingActive(bool: boolean): void {
   store.dispatch(toggleTypingActive(bool));
 }
-
-export function resetQueuedTyping(): void {
-  store.dispatch(emptyOutQueuedTyping());
-}
-
-export function setCurrentTypingMsgState(msg: string): void {
-  store.dispatch(setCurrentTypingMessage(msg));
-}
-export function setCurrentQueueMarkerState(index: number): void {
-  store.dispatch(setCurrentQueueMarker(index));
-}
 export function addAssistantMessageToChat(msg: Message): void {
-  store.dispatch(appeendToNewChatSequence(msg));
+  store.dispatch(appendToNewChatSequence(msg));
+}
+export function takeOneAndType(): void {
+  store.dispatch(takeOneTypeIt());
 }

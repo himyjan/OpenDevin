@@ -12,6 +12,7 @@ python = "^3.11"
 datasets = "*"
 pandas = "*"
 litellm = "*"
+google-generativeai = "*" # To use litellm with Gemini Pro API
 termcolor = "*"
 seaborn = "*"
 docker = "*"
@@ -30,7 +31,6 @@ chromadb = "*"
 llama-index-embeddings-huggingface = "*"
 llama-index-embeddings-azure-openai = "*"
 llama-index-embeddings-ollama = "*"
-pymupdfb = "*"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "*"

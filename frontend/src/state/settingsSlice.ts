@@ -1,31 +1,31 @@
 import { createSlice } from "@reduxjs/toolkit";
+import i18next from "i18next";
+import ArgConfigType from "../types/ConfigType";
 
 export const settingsSlice = createSlice({
   name: "settings",
   initialState: {
-    model: localStorage.getItem("model") || "",
-    agent: localStorage.getItem("agent") || "MonologueAgent",
-    workspaceDirectory:
-      localStorage.getItem("workspaceDirectory") || "./workspace",
-    language: localStorage.getItem("language") || "en",
-  },
+    [ArgConfigType.LLM_MODEL]:
+      localStorage.getItem(ArgConfigType.LLM_MODEL) || "",
+    [ArgConfigType.AGENT]: localStorage.getItem(ArgConfigType.AGENT) || "",
+    [ArgConfigType.WORKSPACE_DIR]:
+      localStorage.getItem(ArgConfigType.WORKSPACE_DIR) || "",
+    [ArgConfigType.LANGUAGE]:
+      localStorage.getItem(ArgConfigType.LANGUAGE) || "en",
+  } as { [key: string]: string },
   reducers: {
-    setModel: (state, action) => {
-      state.model = action.payload;
-    },
-    setAgent: (state, action) => {
-      state.agent = action.payload;
-    },
-    setWorkspaceDirectory: (state, action) => {
-      state.workspaceDirectory = action.payload;
-    },
-    setLanguage: (state, action) => {
-      state.language = action.payload;
+    setByKey: (state, action) => {
+      const { key, value } = action.payload;
+      state[key] = value;
+      localStorage.setItem(key, value);
+      // language is a special case for now.
+      if (key === ArgConfigType.LANGUAGE) {
+        i18next.changeLanguage(value);
+      }
     },
   },
 });
 
-export const { setModel, setAgent, setWorkspaceDirectory, setLanguage } =
-  settingsSlice.actions;
+export const { setByKey } = settingsSlice.actions;
 
 export default settingsSlice.reducer;
